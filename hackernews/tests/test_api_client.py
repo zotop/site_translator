@@ -22,30 +22,42 @@ def test_get_top_stories():
     assert isinstance(top_stories[0]['score'], int)
     assert top_stories[0]['type'] == 'story'
 
-def test_sort_stories_by_ranking():
-    """Sorting stories from the most voted to the least voted"""
-    stories = [{'score': 100}, {'score': 300}, {'score': 200}]
-    stories_by_ranking = APIClient().sort_stories_by_ranking(stories)
+def test_get_kids():
+    """Retrieves kids of an item"""
 
-    assert [story['score'] for story in stories_by_ranking] == [300, 200, 100]
-
-def test_get_all_comments():
-    """Retrieves all the comments belonging to a story"""
-
-    # the story will have 3 descendants in total
+    # the story will have 2 descendants in total
     def get_item(*args):
         if args[0] == 2:
             return {'id': 2}
         elif args[0] == 3:
-            return {'id': 3, 'kids': [4]}
-        elif args[0] == 4:
-            return {'id': 4}
+            return {'id': 3}
 
     api_client = APIClient()
     api_client.get_item = Mock(side_effect=get_item)
     story = {'id': 1, 'kids': [2, 3]}
-    comments = api_client.get_all_comments(story)
+    comments = api_client.get_kids(story)
     comment_ids = [comment['id'] for comment in comments]
     comment_ids.sort()
 
-    assert comment_ids == [2, 3, 4]
+    assert comment_ids == [2, 3]
+
+def test_get_top_stories_with_comments():
+    """Retrieves the top stories with all its direct kids/comments"""
+
+    def get_top_stories(*args):
+        return [{'id': 1, 'kids': [2]}, {'id': 3, 'kids': [4, 5]}]
+
+    def get_kids(*args):
+        if args[0] == {'id': 1, 'kids': [2]}:
+            return [{'id': 2}]
+        elif args[0] == {'id': 3, 'kids': [4, 5]}:
+            return [{'id': 4}, {'id': 5}]
+
+    api_client = APIClient()
+    api_client.get_top_stories = Mock(side_effect=get_top_stories)
+    api_client.get_kids = Mock(side_effect=get_kids)
+    items = api_client.get_top_stories_with_comments(2) # get two top stories
+    item_ids = [item['id'] for item in items]
+    item_ids.sort()
+
+    assert item_ids == [1, 2, 3, 4, 5]

@@ -26,24 +26,29 @@ class APIClient(object):
             for future in future_results:
                 yield future.result().json()
 
-    def sort_stories_by_ranking(self, stories):
-        return sorted(stories, key = lambda story : story['score'], reverse = True)
-
-    def get_all_comments(self, story):
-        return self.get_kids(story)
-
     def get_item(self, item_id):
         return requests.get(ITEM_URL.format(item_id=item_id)).json()
 
     def get_kids(self, parent):
-        if 'kids' in parent:
+        if  'kids' in parent:
             executor = concurrent.futures.ThreadPoolExecutor()
             future_results = [executor.submit(self.get_item, item_id) for item_id in parent['kids']]
             results = []
-            for future in concurrent.futures.as_completed(future_results):
+            concurrent.futures.wait(future_results)
+            for future in future_results:
                 result = future.result()
                 results.append(result)
-                results.extend(self.get_kids(result))
             return results
         else:
             return []
+
+    def get_top_stories_with_comments(self, max_number_of_stories = 10):
+        top_stories = self.get_top_stories()
+        top_stories = top_stories[:max_number_of_stories]
+        executor = concurrent.futures.ThreadPoolExecutor()
+        future_results = [executor.submit(self.get_kids, story) for story in top_stories]
+        concurrent.futures.wait(future_results)
+        items = top_stories
+        for future in future_results:
+            items.extend(future.result())
+        return items
