@@ -1,7 +1,7 @@
 import pytest
 import json
 from mock import Mock
-from ..api_client import APIClient
+from app.api_client import APIClient
 
 
 def test_get_top_stories_ids():
