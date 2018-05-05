@@ -45,19 +45,25 @@ def test_get_top_stories_with_comments():
     """Retrieves the top stories with all its direct kids/comments"""
 
     def get_top_stories(*args):
-        return [{'id': 1, 'kids': [2]}, {'id': 3, 'kids': [4, 5]}]
+        return [{'id': 1, 'kids': [3]}, {'id': 2, 'kids': [4, 5]}]
 
     def get_kids(*args):
-        if args[0] == {'id': 1, 'kids': [2]}:
-            return [{'id': 2}]
-        elif args[0] == {'id': 3, 'kids': [4, 5]}:
+        if args[0] == {'id': 1, 'kids': [3]}:
+            return [{'id': 3}]
+        elif args[0] == {'id': 2, 'kids': [4, 5]}:
             return [{'id': 4}, {'id': 5}]
 
     api_client = APIClient()
     api_client.get_top_stories = Mock(side_effect=get_top_stories)
     api_client.get_kids = Mock(side_effect=get_kids)
-    items = api_client.get_top_stories_with_comments(2) # get two top stories
-    item_ids = [item['id'] for item in items]
-    item_ids.sort()
+    result = api_client.get_top_stories_with_comments(2) # get two top stories
+    stories = result['stories']
+    comments = result['comments']
+    stories_ids = [story['id'] for story in stories]
+    stories_ids.sort()
+    comments_ids = [comment['id'] for comment in comments]
+    comments_ids.sort()
 
-    assert item_ids == [1, 2, 3, 4, 5]
+    assert set(['comments', 'stories']) == set(result.keys())
+    assert stories_ids == [1, 2]
+    assert comments_ids == [3, 4, 5]

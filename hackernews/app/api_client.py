@@ -43,12 +43,14 @@ class APIClient(object):
             return []
 
     def get_top_stories_with_comments(self, max_number_of_stories = 10):
+        result = {'stories': [], 'comments': []}
         top_stories = self.get_top_stories()
         top_stories = top_stories[:max_number_of_stories]
+        result['stories'].extend(top_stories)
         executor = concurrent.futures.ThreadPoolExecutor()
         future_results = [executor.submit(self.get_kids, story) for story in top_stories]
         concurrent.futures.wait(future_results)
-        items = top_stories
         for future in future_results:
-            items.extend(future.result())
-        return items
+            result['comments'].extend(future.result())
+            
+        return result
