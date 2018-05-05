@@ -52,5 +52,5 @@ class APIClient(object):
         concurrent.futures.wait(future_results)
         for future in future_results:
             result['comments'].extend(future.result())
-            
+
         return result
