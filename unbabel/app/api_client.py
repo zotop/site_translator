@@ -24,3 +24,6 @@ class APIClient(object):
                 data['objects'].append(new_object)
 
         return requests.patch(TRANSLATION_URL, json.dumps(data), headers=HEADERS)
+
+    def get_translation(self, uid):
+        return requests.get('{}{}'.format(TRANSLATION_URL, uid), headers=HEADERS)
