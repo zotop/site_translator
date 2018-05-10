@@ -1,7 +1,7 @@
 from flask import Flask, json, jsonify
 from os import environ
-from app.database_wrapper import DatabaseWrapper
-from app.api_client import APIClient
+from database_wrapper import DatabaseWrapper
+from api_client import APIClient
 
 app = Flask(__name__)
 

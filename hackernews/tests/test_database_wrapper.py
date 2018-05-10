@@ -1,5 +1,5 @@
 import pytest
-from app.database_wrapper import DatabaseWrapper
+from database_wrapper import DatabaseWrapper
 
 @pytest.fixture(scope='session')
 def db_wrapper():

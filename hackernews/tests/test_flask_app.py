@@ -1,13 +1,13 @@
 import pytest
 import json
 import mock
-from app.app import app
+from flask_app import app
 
 @pytest.fixture(scope='session')
 def test_client():
     return app.test_client()
 
-@mock.patch('app.api_client.APIClient.get_top_stories_with_comments')
+@mock.patch('api_client.APIClient.get_top_stories_with_comments')
 def test_get_top_stories_with_comments(mock_method, test_client):
     '''GET /top_stories/<int:number_of_stories> should return json'''
 
