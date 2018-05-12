@@ -23,7 +23,7 @@ def test_insert_multiple_translations(db_wrapper):
     assert inserted_translation_2['text'] == 'test_2'
 
 def test_update_multiple_translations(db_wrapper):
-    '''Should update a document if it has same 'uid' instead of inserting new one'''
+    """Should update a document if it has same 'uid' instead of inserting new one"""
 
     translations = [{'uid': '1', 'status': 'new'}, {'uid': '2', 'status': 'new'}]
     db_wrapper.upsert_translations(translations)
@@ -37,3 +37,16 @@ def test_update_multiple_translations(db_wrapper):
     assert db_wrapper.db.translations.count() == 2
     assert translation_1['status'] == 'completed'
     assert translation_2['status'] == 'completed'
+
+def test_get_translations(db_wrapper):
+    """Should only get the specificied fields of each translation"""
+    translations = [{'uid' : '1', 'status': 'new', 'text': 'hello',
+                     'source_language': 'en', 'target_language': 'fr',
+                     'text_format': 'text'}]
+    db_wrapper.upsert_translations(translations)
+    translations = db_wrapper.get_translations(['uid', 'status'])
+
+    assert len(translations) == 1
+    assert len(translations[0].keys()) == 2
+    assert translations[0]['uid'] == '1'
+    assert translations[0]['status'] == 'new'
