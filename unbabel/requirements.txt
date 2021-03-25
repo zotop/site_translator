@@ -21,7 +21,7 @@ prometheus-client==0.0.20
 py==1.5.3
 pymongo==3.6.1
 pytest==3.5.1
-PyYAML==3.12
+PyYAML==5.4
 requests==2.18.4
 six==1.11.0
 urllib3==1.22
